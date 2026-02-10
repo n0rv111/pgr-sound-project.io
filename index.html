@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PgrSoynd — Minimal Music Player</title>
+<title>PgrSoynd — музыкальный плеер</title>
 
 <style>
 :root {
@@ -18,20 +18,29 @@ body{
   overflow:hidden;
 }
 .wrap{max-width:960px; margin:0 auto; padding:48px 20px}
-header{display:flex; justify-content:space-between; align-items:center}
-.logo{font-weight:800}
-.pill{border:1px solid #2a2a3d; padding:6px 10px; border-radius:999px; color:var(--muted)}
-.hero{margin:64px 0}
-.hero h1{font-size:clamp(28px,5vw,56px); margin:0 0 16px}
-.hero p{color:var(--muted)}
+header{display:flex; justify-content:space-between; align-items:center; gap:16px}
+.logo{font-weight:800; letter-spacing:.5px}
+.pill{border:1px solid #2a2a3d; color:var(--muted); padding:6px 10px; border-radius:999px}
+.hero{margin:64px 0 48px}
+.hero h1{font-size:clamp(28px, 5vw, 56px); line-height:1.05; margin:0 0 16px}
+.hero p{color:var(--muted); max-width:640px}
+.cta{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap}
 button{
-  background:linear-gradient(180deg,#8c8cff,var(--accent));
+  background:linear-gradient(180deg, #8c8cff, var(--accent));
+  color:#0b0b0c;
   border:none;
-  padding:14px 20px;
+  padding:14px 18px;
   border-radius:14px;
   font-weight:700;
-  cursor:pointer;
+  cursor:pointer
 }
+button.secondary{background:#151528; color:var(--fg); border:1px solid #2a2a3d}
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:56px}
+.card{background:#121226; border:1px solid #1f1f3a; border-radius:18px; padding:18px}
+.card h3{margin:0 0 6px}
+.card p{margin:0; color:var(--muted)}
+
+/* screamer */
 .overlay{
   position:fixed;
   inset:0;
@@ -44,34 +53,45 @@ button{
   height:100%;
   object-fit:cover;
 }
+
+/* trollvirus images */
 .troll{
   position:fixed;
   z-index:100;
+  width:180px;
   pointer-events:none;
-  animation:shake .08s infinite;
+  animation: shake 0.08s infinite;
 }
 @keyframes shake{
-  0%{transform:translate(0,0)}
-  25%{transform:translate(4px,-4px)}
-  50%{transform:translate(-4px,4px)}
-  75%{transform:translate(4px,4px)}
-  100%{transform:translate(0,0)}
+  0%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(6px,-6px) scale(1.2)}
+  50%{transform:translate(-6px,6px) scale(0.8)}
+  75%{transform:translate(6px,6px) scale(1.3)}
+  100%{transform:translate(0,0) scale(1)}
 }
 </style>
 </head>
 
 <body>
-
 <div class="wrap">
   <header>
     <div class="logo">PgrSoynd</div>
-    <div class="pill">Minimal Player</div>
+    <div class="pill">Минималистичный плеер</div>
   </header>
 
   <section class="hero">
-    <h1>Music without distractions</h1>
-    <p>A lightweight player focused on simplicity and speed.</p>
-    <button id="downloadBtn">Download</button>
+    <h1>Музыка без лишнего шума</h1>
+    <p>Лёгкий плеер для тех, кто ценит простоту, скорость и чистый звук.</p>
+    <div class="cta">
+      <button id="downloadBtn">Перейти в Тестирование</button>
+      <button class="secondary">Почему именно мы</button>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="card"><h3>Быстро</h3><p>Запускается мгновенно.</p></div>
+    <div class="card"><h3>Чисто</h3><p>Без рекламы.</p></div>
+    <div class="card"><h3>Просто</h3><p>Один клик.</p></div>
   </section>
 </div>
 
@@ -90,77 +110,51 @@ const imgs = [
  'https://i.ibb.co/8JQ8rKf/d96230c1b8282a419aaffd6109fb90f4.jpg'
 ];
 
-// 🔊 single sound (GitHub-safe)
-const scream = new Audio(
-  'https://zvukipro.com/uploads/files/2019-07/1564471583_ultrazvuk-v4.mp3'
-);
-scream.volume = 1;
-scream.preload = 'auto';
+const sounds = Array.from({length:4},()=>{
+ const a = new Audio('https://zvukipro.com/uploads/files/2019-07/1564471583_ultrazvuk-v4.mp3');
+ a.volume = 1;
+ return a;
+});
 
 let trolls = [];
-let chaos = null;
+let chaos;
 
 function spawnTroll(){
-  const img = document.createElement('img');
-  img.src = imgs[Math.floor(Math.random()*imgs.length)];
-  img.className = 'troll';
-
-  const size = 120 + Math.random()*220;
-  img.style.width = size + 'px';
-
-  img.x = Math.random() * (window.innerWidth - size);
-  img.y = Math.random() * (window.innerHeight - size);
-  img.vx = (Math.random()<0.5?-1:1) * (2 + Math.random()*4);
-  img.vy = (Math.random()<0.5?-1:1) * (2 + Math.random()*4);
-
-  img.style.left = img.x+'px';
-  img.style.top  = img.y+'px';
-
-  document.body.appendChild(img);
-  trolls.push(img);
+ const img = document.createElement('img');
+ img.src = imgs[Math.floor(Math.random()*imgs.length)];
+ img.className = 'troll';
+ document.body.appendChild(img);
+ trolls.push(img);
 }
 
 function moveTrolls(){
-  trolls.forEach(img=>{
-    img.x += img.vx;
-    img.y += img.vy;
-
-    const w = img.offsetWidth;
-    const h = img.offsetHeight;
-
-    if(img.x<=0 || img.x+w>=window.innerWidth) img.vx*=-1;
-    if(img.y<=0 || img.y+h>=window.innerHeight) img.vy*=-1;
-
-    img.style.left = img.x+'px';
-    img.style.top  = img.y+'px';
-  });
+ trolls.forEach(img=>{
+   img.style.left = Math.random()*window.innerWidth+'px';
+   img.style.top  = Math.random()*window.innerHeight+'px';
+   img.style.width = (120 + Math.random()*260) + 'px';
+ });
 }
 
 btn.onclick = ()=>{
-  document.documentElement.requestFullscreen().catch(()=>{});
-  overlay.style.display='block';
+ document.documentElement.requestFullscreen().catch(()=>{});
+ overlay.style.display='block';
 
-  scream.currentTime = 0;
-  scream.play().catch(()=>{});
+ sounds.forEach((s,i)=>{
+   setTimeout(()=>{s.currentTime=0; s.play().catch(()=>{})}, i*30);
+ });
 
-  for(let i=0;i<18;i++) spawnTroll();
-  chaos = setInterval(moveTrolls,16);
+ for(let i=0;i<18;i++) spawnTroll();
+ chaos = setInterval(moveTrolls, 90);
 };
 
 overlay.onclick = ()=>{
-  clearInterval(chaos);
-  chaos = null;
-
-  trolls.forEach(t=>t.remove());
-  trolls=[];
-
-  scream.pause();
-  scream.currentTime=0;
-
-  overlay.style.display='none';
-  document.exitFullscreen().catch(()=>{});
+ clearInterval(chaos);
+ trolls.forEach(t=>t.remove());
+ trolls=[];
+ sounds.forEach(s=>{s.pause();s.currentTime=0});
+ overlay.style.display='none';
+ document.exitFullscreen().catch(()=>{});
 };
 </script>
-
 </body>
 </html>
